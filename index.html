@@ -256,7 +256,7 @@
                 <label for="address">戶籍地址</label>
                 <input type="text" id="address" name="address" value="台北市文山區萬有里20鄰羅斯福路六段120巷5弄50之9號八樓" required>
                 <div id="addressError" class="error"></div>
-                <div class="field-info">系統將自動提取「<span id="liDisplay" class="auto-extract">萬有里</span>」作為里別</div>
+                <!--<div class="field-info">系統將自動提取「<span id="liDisplay" class="auto-extract">萬有里</span>」作為里別</div>-->
             </div>
 
             <div class="form-group">
@@ -267,7 +267,7 @@
 
             <div class="form-group">
                 <label for="email">Email (選填)</label>
-                <input type="email" id="email" name="email" value="123@yahoo.com">
+                <input type="email" id="email" name="email" value="nicetomeetyou@google.com">
             </div>
 
             <div class="buttons">
@@ -278,7 +278,7 @@
 
             <div class="important-notification">
                 注意：您必須以一張一頁的方式列印<br>
-                在連署書簽名欄以正楷親自簽名<br>
+                在連署書簽名欄以正楷親自簽名或蓋章<br>
                 並交給現場志工或官方認可之連署站點<br>
                 或寄送至116970木柵郵局第224號信箱<br>
                 才算完成連署作業！<br>
@@ -457,7 +457,7 @@
                 const liIndex = address.indexOf('里');
 
                 if (liIndex !== -1 && liIndex >= 2) {
-                    return address.substring(liIndex - 2, liIndex + 1);
+                    return address.substring(liIndex - 2, liIndex);
                 }
 
                 return '';
@@ -466,32 +466,26 @@
             // 驗證地址格式
             function validateAddress(address) {
                 let errorMessages = [];
-
                 // 檢查是否以「台北市」或「臺北市」開頭
                 if (!address.startsWith('台北市') && !address.startsWith('臺北市')) {
                     errorMessages.push('地址必須以「台北市」或「臺北市」開頭');
                 }
-
                 // 檢查是否包含「文山區」或「中正區」
                 if (address.indexOf('文山區') === -1 && address.indexOf('中正區') === -1) {
                     errorMessages.push('地址必須包含「文山區」或「中正區」');
                 }
-
                 // 檢查是否包含「里」與「鄰」
                 if (address.indexOf('里') === -1) {
                     errorMessages.push('地址必須包含「里」');
                 }
-
                 if (address.indexOf('鄰') === -1) {
                     errorMessages.push('地址必須包含「鄰」');
                 }
-
                 // 檢查是否包含「路」或「街」
                 if (address.indexOf('路') === -1 && address.indexOf('街') === -1) {
                     errorMessages.push('地址必須包含「路」或「街」');
                 }
-
-                // 檢查「段」與「樓」之前為國字（一～九）
+                // 檢查「段」之前為國字（一～九）
                 const segmentIndex = address.indexOf('段');
                 if (segmentIndex !== -1) {
                     const charBeforeSegment = address.charAt(segmentIndex - 1);
@@ -500,11 +494,33 @@
                     }
                 }
 
+                // 修正後的樓層檢查邏輯，允許一位到三位國字
                 const floorIndex = address.indexOf('樓');
                 if (floorIndex !== -1) {
-                    const charBeforeFloor = address.charAt(floorIndex - 1);
-                    if (!['一', '二', '三', '四', '五', '六', '七', '八', '九'].includes(charBeforeFloor)) {
-                        errorMessages.push('「樓」之前必須為國字（一～九）');
+                    // 檢查「樓」前面可能是一到三位的國字
+                    const chineseNumerals = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+                    let isValid = false;
+
+                    // 檢查前一位
+                    if (floorIndex > 0 && chineseNumerals.includes(address.charAt(floorIndex - 1))) {
+                        isValid = true;
+                    }
+                    // 檢查前兩位（例如：十一樓）
+                    else if (floorIndex > 1 &&
+                        chineseNumerals.includes(address.charAt(floorIndex - 2)) &&
+                        chineseNumerals.includes(address.charAt(floorIndex - 1))) {
+                        isValid = true;
+                    }
+                    // 檢查前三位（例如：二十一樓）
+                    else if (floorIndex > 2 &&
+                        chineseNumerals.includes(address.charAt(floorIndex - 3)) &&
+                        chineseNumerals.includes(address.charAt(floorIndex - 2)) &&
+                        chineseNumerals.includes(address.charAt(floorIndex - 1))) {
+                        isValid = true;
+                    }
+
+                    if (!isValid) {
+                        errorMessages.push('「樓」之前必須為一位到三位國字（例如：一樓、十樓、二十一樓）');
                     }
                 }
 
@@ -516,7 +532,6 @@
                         errorMessages.push('「巷」之前必須為阿拉伯數字');
                     }
                 }
-
                 const laneIndex = address.indexOf('弄');
                 if (laneIndex !== -1) {
                     const charBeforeLane = address.charAt(laneIndex - 1);
@@ -524,7 +539,6 @@
                         errorMessages.push('「弄」之前必須為阿拉伯數字');
                     }
                 }
-
                 const ofIndex = address.indexOf('之');
                 if (ofIndex !== -1) {
                     const charBeforeOf = address.charAt(ofIndex - 1);
@@ -532,7 +546,6 @@
                         errorMessages.push('「之」之前必須為阿拉伯數字');
                     }
                 }
-
                 // 檢查「號」之前必須為阿拉伯數字
                 const numberIndex = address.indexOf('號');
                 if (numberIndex !== -1) {
@@ -543,7 +556,6 @@
                 } else {
                     errorMessages.push('地址必須包含「號」');
                 }
-
                 return errorMessages;
             }
 
@@ -551,7 +563,7 @@
             addressInput.addEventListener('input', function () {
                 const address = this.value;
                 const li = extractLiFromAddress(address);
-                liDisplay.textContent = li || '無法識別';
+                //liDisplay.textContent = li || '無法識別';
 
                 // 即時檢查地址格式
                 const addressErrors = validateAddress(address);
@@ -823,7 +835,7 @@
                 document.getElementById('phoneError').textContent = "";
 
                 // 更新里別顯示
-                liDisplay.textContent = "無法識別";
+                //liDisplay.textContent = "無法識別";
             });
 
             // 列印按鈕點擊事件
@@ -1006,7 +1018,7 @@
             // 初始化時執行一次地址提取，顯示里別
             const initialAddress = document.getElementById('address').value;
             const initialLi = extractLiFromAddress(initialAddress);
-            liDisplay.textContent = initialLi || '無法識別';
+            //liDisplay.textContent = initialLi || '無法識別';
 
             // 初始化時檢查地址格式
             const initialAddressErrors = validateAddress(initialAddress);

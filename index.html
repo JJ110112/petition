@@ -492,6 +492,11 @@
                     if (!['一', '二', '三', '四', '五', '六', '七', '八', '九'].includes(charBeforeSegment)) {
                         errorMessages.push('「段」之前必須為國字（一～九）');
                     }
+                // 禁止特殊符號（保留常用中文地址符號）
+                const invalidCharPattern = /[^a-zA-Z0-9\u4e00-\u9fa5\s里鄰路街段巷弄號之樓]/g;
+                if (invalidCharPattern.test(address)) {
+                  errorMessages.push('地址不可包含特殊符號');
+}
                 }
 
                 // 修正後的樓層檢查邏輯，允許一位到三位國字

@@ -227,13 +227,10 @@
 <body>
     <div class="container">
         <h1>臺北市第8選舉區立法委員</h1>
-        <h1>賴士葆罷免案連署表單</h1>
+        <h1>賴士葆免案連署表單</h1>
 
         <div class="notification">
-            此系統只適用於產生賴仕葆罷免連署書<br>
-            操作過程於使用者電腦或手機端完成<br>
-            不會上傳或紀錄個人資料<br>
-            請先填寫以下資料<br>
+            此系統將協助您填寫聲明書與連署書<br>請先填寫以下資料
         </div>
 
         <form id="petitionForm">
@@ -773,8 +770,11 @@ function validatePhone(phone) {
                     document.getElementById('nameError').textContent = '';
                 }
 
-                if (!validateID(id)) {
-                    document.getElementById('idError').textContent = '請輸入有效的身分證字號';
+                if (!id) {
+                    document.getElementById('idError').textContent = '請輸入身分證字號';
+                    hasError = true;
+                } else if (!/^[A-Z][0-9]{9}$/.test(id)) {
+                    document.getElementById('idError').textContent = '身分證字號格式錯誤，需為1個大寫英文字母＋9碼數字';
                     hasError = true;
                 } else {
                     document.getElementById('idError').textContent = '';

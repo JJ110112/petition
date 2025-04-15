@@ -268,6 +268,7 @@
             <div class="form-group">
                 <label for="email">Email (選填)</label>
                 <input type="email" id="email" name="email" value="nicetomeetyou@google.com">
+<div id="emailError" class="error"></div>
             </div>
 
             <div class="buttons">
@@ -492,11 +493,6 @@
                     if (!['一', '二', '三', '四', '五', '六', '七', '八', '九'].includes(charBeforeSegment)) {
                         errorMessages.push('「段」之前必須為國字（一～九）');
                     }
-                // 禁止特殊符號（保留常用中文地址符號）
-                const invalidCharPattern = /[^a-zA-Z0-9\u4e00-\u9fa5\s里鄰路街段巷弄號之樓]/g;
-                if (invalidCharPattern.test(address)) {
-                  errorMessages.push('地址不可包含特殊符號');
-}
                 }
 
                 // 修正後的樓層檢查邏輯，允許一位到三位國字
@@ -561,6 +557,13 @@
                 } else {
                     errorMessages.push('地址必須包含「號」');
                 }
+                
+                // 禁止特殊符號（保留常用中文地址符號）
+                const invalidCharPattern = /[^a-zA-Z0-9一-龥\s里鄰路街段巷弄號之樓]/g;
+                if (invalidCharPattern.test(address)) {
+                    errorMessages.push('地址不可包含特殊符號');
+                }
+
                 return errorMessages;
             }
 
@@ -609,7 +612,14 @@
             }
 
             // 驗證手機號碼
-            function validatePhone(phone) {
+            
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+
+function validatePhone(phone) {
                 return /^09\d{8}$/.test(phone);
             }
 
@@ -796,6 +806,15 @@
                     hasError = true;
                 } else {
                     document.getElementById('phoneError').textContent = '';
+                }
+
+                
+                const email = document.getElementById('email').value;
+                if (email && !validateEmail(email)) {
+                    document.getElementById('emailError').textContent = 'Email 格式不正確';
+                    hasError = true;
+                } else {
+                    document.getElementById('emailError').textContent = '';
                 }
 
                 return !hasError;

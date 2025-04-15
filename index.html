@@ -783,6 +783,9 @@ function validatePhone(phone) {
                 if (!birthDate) {
                     document.getElementById('birthError').textContent = '請輸入出生年月日';
                     hasError = true;
+                } else if (birthDate.length > 8) {
+                    document.getElementById('birthError').textContent = '出生年月日格式錯誤，請勿超過8個字';
+                    hasError = true;
                 } else {
                     document.getElementById('birthError').textContent = '';
                 }

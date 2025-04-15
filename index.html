@@ -256,6 +256,13 @@
                 <label for="address">戶籍地址</label>
                 <input type="text" id="address" name="address" value="台北市文山區萬有里20鄰羅斯福路六段120巷5弄50之9號八樓" required>
                 <div id="addressError" class="error"></div>
+                <div class="form-group">
+    <label>
+        <input type="checkbox" id="addressConfirm">
+        我確認以上地址和身分證背後所寫的地址是一致的（包括鄰、里、路/街、巷弄等）
+    </label>
+    <div id="addressConfirmError" class="error"></div>
+</div>
                 <!--<div class="field-info">系統將自動提取「<span id="liDisplay" class="auto-extract">萬有里</span>」作為里別</div>-->
             </div>
 
@@ -823,7 +830,16 @@ function validatePhone(phone) {
                     document.getElementById('emailError').textContent = '';
                 }
 
-                return !hasError;
+                const addressConfirmed = document.getElementById('addressConfirm').checked;
+if (!addressConfirmed) {
+    document.getElementById('addressConfirmError').textContent = '請確認地址與身分證背面一致';
+    hasError = true;
+} else {
+    document.getElementById('addressConfirmError').textContent = '';
+}
+
+return !hasError;
+
             }
 
             // 預覽按鈕點擊事件

@@ -222,26 +222,12 @@
             color: #4CAF50;
             font-style: italic;
         }
-
-        .mode-indicator {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #f44336;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>臺北市第8選舉區立法委員</h1>
         <h1>賴士葆罷免案連署表單</h1>
-
-        <div id="volunteerModeIndicator" class="mode-indicator" style="display: none;">志工模式</div>
 
         <div class="notification">
             此系統只適用於產生賴仕葆罷免連署書<br>
@@ -304,7 +290,7 @@
             <div class="important-notification">
                 注意：您必須以一張一頁的方式列印<br>
                 在連署書簽名欄以正楷親自簽名或蓋章<br>
-                並交給現場志工或<a href="https://sites.google.com/view/banibao/%E9%80%A3%E7%BD%B2%E7%AB%99%E8%B3%87%E8%A8%8A">官方認可之連署站點</a><br>
+                並交給現場志工或官方認可之連署站點<br>
                 或寄送至116970木柵郵局第224號信箱<br>
                 才算完成連署作業！<br>
             </div>
@@ -345,10 +331,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // 獲取URL參數
-            const urlParams = new URLSearchParams(window.location.search);
-            const isVolunteerMode = urlParams.has('volunteer') || urlParams.has('vol');
-
             // 獲取DOM元素
             const form = document.getElementById('petitionForm');
             const previewBtn = document.getElementById('previewBtn');
@@ -367,17 +349,11 @@
             const previewPlaceholder2 = document.getElementById('previewPlaceholder2');
             const previewText1 = document.getElementById('previewText1');
             const previewText2 = document.getElementById('previewText2');
+            const liDisplay = document.getElementById('liDisplay');
             const loading = document.getElementById('loading');
             const loadingMessage = document.getElementById('loadingMessage');
             const addressInput = document.getElementById('address');
             const addressError = document.getElementById('addressError');
-            const volunteerModeIndicator = document.getElementById('volunteerModeIndicator');
-
-            // 設置志工模式
-            if (isVolunteerMode) {
-                printBtn.textContent = '套印文件';
-                volunteerModeIndicator.style.display = 'block';
-            }
 
             // 設置默認寬高
             canvas1.width = 800;
@@ -392,13 +368,8 @@
             let page2Loaded = false;
 
             // 載入圖片
-            if (isVolunteerMode) {
-                page1Image.src = 'blank.jpg';
-                page2Image.src = 'blank.jpg';
-            } else {
-                page1Image.src = 'page1.jpg';
-                page2Image.src = 'page2.jpg';
-            }
+            page1Image.src = 'page1.jpg';
+            page2Image.src = 'page2.jpg';
 
             page1Image.onload = function () {
                 canvas1.width = page1Image.width;
@@ -407,7 +378,7 @@
             };
 
             page1Image.onerror = function () {
-                console.error('無法載入聲明書範本圖片');
+                console.error('無法載入聲明書範本圖片 page1.jpg');
                 canvas1.style.display = 'none';
                 previewPlaceholder1.style.display = 'flex';
                 page1Loaded = false;
@@ -420,7 +391,7 @@
             };
 
             page2Image.onerror = function () {
-                console.error('無法載入連署書範本圖片');
+                console.error('無法載入連署書範本圖片 page2.jpg');
                 canvas2.style.display = 'none';
                 previewPlaceholder2.style.display = 'flex';
                 page2Loaded = false;
@@ -457,44 +428,25 @@
             const PETITION_COORDS = {
                 // 姓名座標位置
                 NAME_X: 335,
-                NAME_Y: 475,
+                NAME_Y: 367,
 
                 // 身分證字號起始座標及間距
                 ID_START_X: 212,  // 第一碼X座標
-                ID_Y: 530,        // 身分證字號Y座標
+                ID_Y: 422,        // 身分證字號Y座標
                 ID_SPACING: 38,   // 每一碼之間的間距
 
                 // 出生年月日座標位置
                 BIRTH_DATE_X: 630,
-                BIRTH_DATE_Y: 500,
+                BIRTH_DATE_Y: 396,
 
                 // 地址第一行座標位置
                 ADDRESS_LINE1_X: 810,
-                ADDRESS_LINE1_Y: 475,
+                ADDRESS_LINE1_Y: 370,
 
                 // 地址第二行座標位置
                 ADDRESS_LINE2_X: 810,
-                ADDRESS_LINE2_Y: 522
+                ADDRESS_LINE2_Y: 417
             };
-
-            // 根據是否為志工模式調整座標
-            if (isVolunteerMode) {
-                // 第一頁 y 座標減 5
-                DECLARATION_COORDS.NAME_Y -= 13;
-                DECLARATION_COORDS.PHONE_Y -= 13;
-                DECLARATION_COORDS.EMAIL_Y -= 13;
-                DECLARATION_COORDS.LI_Y -= 13;
-                DECLARATION_COORDS.MONTH_Y -= 15;
-                DECLARATION_COORDS.DAY_Y -= 15;
-
-                // 第二頁 y 座標加 10
-                PETITION_COORDS.NAME_Y += 23;
-                PETITION_COORDS.ID_Y += 23;
-                PETITION_COORDS.BIRTH_DATE_Y += 23;
-                PETITION_COORDS.ADDRESS_LINE1_Y += 21;
-                PETITION_COORDS.ADDRESS_LINE2_Y += 21;
-            }
-
 
             // 切換頁籤
             tab1Btn.addEventListener('click', function () {
@@ -667,6 +619,8 @@
             // 監聽地址變更，即時更新里別顯示與檢查格式
             addressInput.addEventListener('input', function () {
                 const address = this.value;
+                const li = extractLiFromAddress(address);
+                //liDisplay.textContent = li || '無法識別';
 
                 // 即時檢查地址格式
                 const addressErrors = validateAddress(address);
@@ -707,14 +661,15 @@
             }
 
             // 驗證手機號碼
-            function validatePhone(phone) {
-                return /^09\d{8}$/.test(phone);
-            }
 
-            // 驗證Email
             function validateEmail(email) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return emailRegex.test(email);
+            }
+
+
+            function validatePhone(phone) {
+                return /^09\d{8}$/.test(phone);
             }
 
             // 繪製聲明書
@@ -756,13 +711,13 @@
                 } else {
                     // 使用純文字顯示
                     previewText1.innerHTML = `
-                            <h3>聲明書資料</h3>
-                            <p><strong>簽名：</strong> ${name}</p>
-                            <p><strong>聯絡手機：</strong> ${phone}</p>
-                            <p><strong>Email：</strong> ${email || '(未填寫)'}</p>
-                            <p><strong>里別：</strong> ${li || '(未識別)'}</p>
-                            <p><strong>簽署日期：</strong> ${currentDate.month}月${currentDate.date}日</p>
-                        `;
+                                                <h3>聲明書資料</h3>
+                                                <p><strong>簽名：</strong> ${name}</p>
+                                                <p><strong>聯絡手機：</strong> ${phone}</p>
+                                                <p><strong>Email：</strong> ${email || '(未填寫)'}</p>
+                                                <p><strong>里別：</strong> ${li || '(未識別)'}</p>
+                                                <p><strong>簽署日期：</strong> ${currentDate.month}月${currentDate.date}日</p>
+                                            `;
 
                     canvas1.style.display = 'none';
                     previewPlaceholder1.style.display = 'flex';
@@ -832,13 +787,13 @@
                 } else {
                     // 使用純文字顯示
                     previewText2.innerHTML = `
-                            <h3>連署書資料</h3>
-                            <p><strong>姓名：</strong> ${name}</p>
-                            <p><strong>身分證字號：</strong> ${id}</p>
-                            <p><strong>出生年月日：</strong> ${birthDate}</p>
-                            <p><strong>戶籍地址第一行：</strong> ${addressLine1}</p>
-                            <p><strong>戶籍地址第二行：</strong> ${addressLine2 || '(無)'}</p>
-                        `;
+                                                <h3>連署書資料</h3>
+                                                <p><strong>姓名：</strong> ${name}</p>
+                                                <p><strong>身分證字號：</strong> ${id}</p>
+                                                <p><strong>出生年月日：</strong> ${birthDate}</p>
+                                                <p><strong>戶籍地址第一行：</strong> ${addressLine1}</p>
+                                                <p><strong>戶籍地址第二行：</strong> ${addressLine2 || '(無)'}</p>
+                                            `;
 
                     canvas2.style.display = 'none';
                     previewPlaceholder2.style.display = 'flex';
@@ -908,6 +863,7 @@
                     document.getElementById('phoneError').textContent = '';
                 }
 
+
                 const email = document.getElementById('email').value;
                 if (email && !validateEmail(email)) {
                     document.getElementById('emailError').textContent = 'Email 格式不正確';
@@ -925,6 +881,7 @@
                 }
 
                 return !hasError;
+
             }
 
             // 預覽按鈕點擊事件
@@ -957,7 +914,6 @@
                 document.getElementById('address').value = "";
                 document.getElementById('phone').value = "";
                 document.getElementById('email').value = "";
-                document.getElementById('addressConfirm').checked = false;
 
                 // 清除錯誤訊息
                 document.getElementById('nameError').textContent = "";
@@ -965,18 +921,15 @@
                 document.getElementById('birthError').textContent = "";
                 document.getElementById('addressError').textContent = "";
                 document.getElementById('phoneError').textContent = "";
-                document.getElementById('emailError').textContent = "";
-                document.getElementById('addressConfirmError').textContent = "";
 
-                // 隱藏預覽區
-                previewContainer.style.display = 'none';
-                printBtn.disabled = true;
+                // 更新里別顯示
+                //liDisplay.textContent = "無法識別";
             });
 
             // 列印按鈕點擊事件
             printBtn.addEventListener('click', function () {
                 loading.style.display = 'flex';
-                loadingMessage.textContent = isVolunteerMode ? '準備套印中，請稍候...' : '準備列印中，請稍候...';
+                loadingMessage.textContent = '準備列印中，請稍候...';
 
                 setTimeout(function () {
                     // 獲取資料
@@ -1017,129 +970,129 @@
                     }
 
                     // 創建列印內容
-                    let printTitle = isVolunteerMode ? '套印文件' : '連署文件';
                     let htmlContent = `
-                            <html>
-                            <head>
-                                <title>${printTitle}</title>
-                                <style>
-                                @page {
-                                    size: landscape;
-                                    margin: 0;
-                                }
-                                body {
-                                    margin: 0;
-                                    padding: 0;
-                                }
-                                .page {
-                                    page-break-after: always;
-                                    margin: 0;
-                                    padding: 0;
-                                }
-                                .last-page {
-                                    page-break-after: avoid;
-                                }
-                                img {
-                                    max-width: 100%;
-                                    height: auto;
-                                    display: block;
-                                    margin: 0 auto;
-                                }
-                                .text-page {
-                                    font-family: "Microsoft JhengHei", "PMingLiU", sans-serif;
-                                    max-width: 800px;
-                                    margin: 0 auto;
-                                    padding: 40px 20px;
-                                    border: 1px solid #000;
-                                }
-                                h1 {
-                                    text-align: center;
-                                    margin-bottom: 30px;
-                                }
-                                .section {
-                                    margin-bottom: 30px;
-                                }
-                                .field {
-                                    margin-bottom: 15px;
-                                }
-                                .field strong {
-                                    display: inline-block;
-                                    width: 120px;
-                                }
-                                .important-note {
-                                    background-color: #ffecb3;
-                                    border: 2px solid #ffa000;
-                                    padding: 15px;
-                                    margin: 15px 0;
-                                    text-align: center;
-                                    font-weight: bold;
-                                }
-                                @media print {
-                                    body { margin: 0; }
-                                    .page { margin: 0; padding: 0; }
-                                    .text-page { border: none; }
-                                    @page { size: landscape; margin: 0; }
-                                }
-                                </style>
-                            </head>
-                            <body>
-                        `;
+                                                <html>
+                                                <head>
+                                                    <title>連署文件</title>
+                                                    <style>
+                                                    @page {
+                                                    size: landscape;
+                                                    margin: 0;
+                                                }
+                                                body {
+                                                    margin: 0;
+                                                    padding: 0;
+                                                }
+                                                .page {
+                                                    page-break-after: always;
+                                                    margin: 0;
+                                                    padding: 0;
+                                                }
+                                                .last-page {
+                                                    page-break-after: avoid;
+                                                }
+                                                img {
+                                                    max-width: 100%;
+                                                    height: auto;
+                                                    display: block;
+                                                    margin: 0 auto;
+                                                }
+                                                .text-page {
+                                                    font-family: "Microsoft JhengHei", "PMingLiU", sans-serif;
+                                                    max-width: 800px;
+                                                    margin: 0 auto;
+                                                    padding: 40px 20px;
+                                                    border: 1px solid #000;
+                                                }
+                                                h1 {
+                                                    text-align: center;
+                                                    margin-bottom: 30px;
+                                                }
+                                                .section {
+                                                    margin-bottom: 30px;
+                                                }
+                                                .field {
+                                                    margin-bottom: 15px;
+                                                }
+                                                .field strong {
+                                                    display: inline-block;
+                                                    width: 120px;
+                                                }
+                                                .important-note {
+                                                    background-color: #ffecb3;
+                                                    border: 2px solid #ffa000;
+                                                    padding: 15px;
+                                                    margin: 15px 0;
+                                                    text-align: center;
+                                                    font-weight: bold;
+                                                }
+                                                @media print {
+                                                    body { margin: 0; }
+                                                    .page { margin: 0; padding: 0; }
+                                                    .text-page { border: none; }
+                                                    @page { size: landscape; margin: 0; }
+                                                }
+
+                                                    </style>
+                                                </head>
+                                                <body>
+                                            `;
 
                     // 第一頁 - 聲明書
                     if (dataUrl1) {
                         htmlContent += `
-                                <div class="page">
-                                    <img src="${dataUrl1}" alt="聲明書" />
-                                </div>
-                            `;
+                                                    <div class="page">
+                                                        <img src="${dataUrl1}" alt="聲明書" />
+                                                    </div>
+                                                `;
                     } else {
                         htmlContent += `
-                                <div class="page text-page">
-                                    <h1>臺北市第8選舉區立法委員賴士葆免案聲明書</h1>
-                                    <div class="section">
-                                        <div class="field"><strong>簽名：</strong>${name}</div>
-                                        <div class="field"><strong>聯絡手機：</strong>${phone}</div>
-                                        <div class="field"><strong>Email：</strong>${email || '(未填寫)'}</div>
-                                        <div class="field"><strong>里別：</strong>${li || '(未識別)'}</div>
-                                        <div class="field"><strong>簽署日期：</strong>${currentDate.month}月${currentDate.date}日</div>
-                                    </div>
-                                </div>
-                            `;
+                                                    <div class="page text-page">
+                                                        <h1>臺北市第8選舉區立法委員賴士葆免案聲明書</h1>
+                                                        <div class="section">
+                                                            <div class="field"><strong>簽名：</strong>${name}</div>
+                                                            <div class="field"><strong>聯絡手機：</strong>${phone}</div>
+                                                            <div class="field"><strong>Email：</strong>${email || '(未填寫)'}</div>
+                                                            <div class="field"><strong>里別：</strong>${li || '(未識別)'}</div>
+                                                            <div class="field"><strong>簽署日期：</strong>${currentDate.month}月${currentDate.date}日</div>
+                                                        </div>
+                                                    </div>
+                                                `;
                     }
 
                     // 第二頁 - 連署書
                     if (dataUrl2) {
                         htmlContent += `
-                                <div class="last-page">
-                                    <img src="${dataUrl2}" alt="連署書" />
-                                </div>
-                            `;
+                                                    <div class="last-page">
+                                                        <img src="${dataUrl2}" alt="連署書" />
+                                                    </div>
+                                                `;
                     } else {
                         htmlContent += `
-                                <div class="last-page text-page">
-                                    <h1>臺北市第8選舉區立法委員賴士葆免案連署書</h1>
-                                    <div class="section">
-                                        <div class="field"><strong>姓名：</strong>${name}</div>
-                                        <div class="field"><strong>身分證字號：</strong>${id}</div>
-                                        <div class="field"><strong>出生年月日：</strong>${birthDate}</div>
-                                        <div class="field"><strong>戶籍地址：</strong>${addressLine1} ${addressLine2}</div>
-                                    </div>
-                                </div>
-                            `;
+                                                    <div class="last-page text-page">
+                                                        <h1>臺北市第8選舉區立法委員賴士葆免案連署書</h1>
+                                                        <div class="section">
+                                                            <div class="field"><strong>姓名：</strong>${name}</div>
+                                                            <div class="field"><strong>身分證字號：</strong>${id}</div>
+                                                            <div class="field"><strong>出生年月日：</strong>${birthDate}</div>
+                                                            <div class="field"><strong>戶籍地址：</strong>${addressLine1} ${addressLine2}</div>
+                                                        </div>
+                                                    </div>
+                                                `;
                     }
 
                     // 結束HTML
                     htmlContent += `
-                            <script>
-                                window.onload = function() {
-                                    setTimeout(function() {
-                                        window.print();
-                                    }, 500);
-                                }
-                            <\/script>
-                            </body>
-                            </html>
-                        `;
+                                                    <script>
+                                                        window.onload = function() {
+                                                            setTimeout(function() {
+                                                                window.print();
+                                                            }, 500);
+                                                        }
+                                                    <\/script>
+                                                </body>
+                                                </html>
+                                            `;
 
                     // 開啟新視窗並列印
                     const printWindow = window.open('', '_blank');
@@ -1150,8 +1103,12 @@
                 }, 500);
             });
 
-            // 初始化時執行一次地址提取，檢查地址格式
+            // 初始化時執行一次地址提取，顯示里別
             const initialAddress = document.getElementById('address').value;
+            const initialLi = extractLiFromAddress(initialAddress);
+            //liDisplay.textContent = initialLi || '無法識別';
+
+            // 初始化時檢查地址格式
             const initialAddressErrors = validateAddress(initialAddress);
             if (initialAddressErrors.length > 0) {
                 addressError.textContent = initialAddressErrors.join('、');

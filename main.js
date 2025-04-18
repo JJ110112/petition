@@ -21,6 +21,23 @@ document.addEventListener('DOMContentLoaded', function () {
     // 加載圖片資源
     loadImages();
 
+    // 直接清除表單（不使用按鈕點擊事件）
+    document.getElementById('name').value = "";
+    document.getElementById('id').value = "";
+    document.getElementById('birthDate').value = "";
+    document.getElementById('address').value = "";
+    document.getElementById('phone').value = "";
+    document.getElementById('email').value = "";
+    document.getElementById('addressConfirm').checked = false;
+
+    // 清除錯誤訊息
+    document.getElementById('nameError').textContent = "";
+    document.getElementById('idError').textContent = "";
+    document.getElementById('birthError').textContent = "";
+    document.getElementById('addressError').textContent = "";
+    document.getElementById('phoneError').textContent = "";
+    document.getElementById('addressConfirmError').textContent = "";
+
     // 切換頁籤
     tab1Btn.addEventListener('click', function () {
         tab1Btn.classList.add('active');
@@ -72,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 清除按鈕點擊事件
+    // 清除按鈕點擊事件 - 保留原始邏輯，地址輸入元件在 address-input.js 中處理
     clearBtn.addEventListener('click', function () {
         document.getElementById('name').value = "";
         document.getElementById('id').value = "";

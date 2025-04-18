@@ -44,7 +44,37 @@
 
             <div class="form-group">
                 <label for="address">戶籍地址（要與身分證上的住址一模一樣!）</label>
-                <input type="text" id="address" name="address" value="台北市文山區萬有里20鄰羅斯福路六段120巷5弄50之9號八樓" required>
+
+                <!-- 改進的地址輸入欄位 -->
+                <div class="address-container">
+                    <!-- 固定的臺北市前綴 -->
+                    <div class="address-prefix">臺北市</div>
+
+                    <!-- 區域下拉選單 -->
+                    <select id="district" class="address-select">
+                        <option value="文山區">文山區</option>
+                        <option value="中正區">中正區</option>
+                    </select>
+
+                    <!-- 里輸入欄位 -->
+                    <div class="address-input-group">
+                        <input type="text" id="li" class="address-input" placeholder="里別">
+                        <span class="address-label">里</span>
+                    </div>
+
+                    <!-- 鄰輸入欄位 -->
+                    <div class="address-input-group">
+                        <input type="text" id="lin" class="address-input" placeholder="鄰別">
+                        <span class="address-label">鄰</span>
+                    </div>
+
+                    <!-- 剩餘地址輸入欄位 -->
+                    <input type="text" id="addressRemain" class="address-remain" placeholder="完整地址（路/街、巷、弄、號、樓）">
+                </div>
+
+                <!-- 隱藏的完整地址欄位（用於與現有程式碼兼容） -->
+                <input type="hidden" id="address" name="address" value="台北市文山區萬有里20鄰羅斯福路六段120巷5弄50之9號八樓">
+
                 <div id="addressError" class="error"></div>
                 <div class="notification">
                     <label>
@@ -117,10 +147,10 @@
         才算完成連署作業！<br>
     </div>
 
-
     <script src="validation.js"></script>
     <script src="drawing.js"></script>
     <script src="pdf-generator.js"></script>
     <script src="main.js"></script>
+    <script src="address-input.js"></script>
 </body>
 </html>

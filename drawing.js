@@ -114,7 +114,7 @@ function drawDeclaration() {
     const ctx1 = canvas1.getContext('2d');
     const previewPlaceholder1 = document.getElementById('previewPlaceholder1');
     const previewText1 = document.getElementById('previewText1');
-    
+
     const name = document.getElementById('name').value;
     const phone = document.getElementById('phone').value;
     const email = document.getElementById('email').value;
@@ -176,7 +176,7 @@ function drawPetition() {
     const ctx2 = canvas2.getContext('2d');
     const previewPlaceholder2 = document.getElementById('previewPlaceholder2');
     const previewText2 = document.getElementById('previewText2');
-    
+
     const name = document.getElementById('name').value;
     const id = document.getElementById('id').value.toUpperCase();
     const birthDate = document.getElementById('birthDate').value;
@@ -210,6 +210,7 @@ function drawPetition() {
         ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
         ctx2.drawImage(page2Image, 0, 0);
 
+        // 設定姓名和地址的字體大小
         ctx2.font = 'bold 26px "Microsoft JhengHei"';
         ctx2.fillStyle = 'black';
 
@@ -223,8 +224,14 @@ function drawPetition() {
             ctx2.fillText(id.charAt(i), xPos, PETITION_COORDS.ID_Y);
         }
 
+        // 調整出生年月日的字體大小，使其較小以避免壓到表格線
+        ctx2.font = 'bold 22px "Microsoft JhengHei"';  // 將字體從26px縮小到22px
+
         // 繪製出生年月日 (修改為新格式)
         ctx2.fillText(formattedBirthDate, PETITION_COORDS.BIRTH_DATE_X, PETITION_COORDS.BIRTH_DATE_Y);
+
+        // 恢復字體大小為地址
+        ctx2.font = 'bold 26px "Microsoft JhengHei"';
 
         // 繪製地址（兩行）
         ctx2.fillText(addressLine1, PETITION_COORDS.ADDRESS_LINE1_X, PETITION_COORDS.ADDRESS_LINE1_Y);

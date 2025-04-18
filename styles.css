@@ -230,3 +230,71 @@ canvas {
         margin-bottom: 8px;
     }
 }
+
+/* 地址輸入元件的樣式 */
+.address-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.address-prefix {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.address-select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.address-input-group {
+    display: flex;
+    align-items: center;
+}
+
+.address-input {
+    width: 60px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.address-label {
+    margin-left: 2px;
+    margin-right: 5px;
+}
+
+.address-remain {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* 針對地址輸入元件的響應式設計 */
+@media (max-width: 768px) {
+    .address-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .address-select,
+    .address-input-group,
+    .address-remain {
+        width: 100%;
+        margin-top: 5px;
+    }
+}

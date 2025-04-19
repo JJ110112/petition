@@ -89,41 +89,25 @@ button:disabled {
 
 #previewContainer {
     margin-top: 20px;
+    display: none;
+}
+
+.preview-section {
+    margin-bottom: 40px;
     text-align: center;
-    display: none;
 }
 
-.tab-buttons {
-    display: flex;
-    margin-bottom: 10px;
-}
-
-.tab-button {
-    flex: 1;
-    padding: 10px;
-    background-color: #666;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-}
-
-    .tab-button.active {
+    .preview-section h3 {
+        font-size: 18px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
         border-bottom: 2px solid #4CAF50;
-        background-color: red;
-        font-weight: bold;
-    }
-
-.preview-tab {
-    display: none;
-}
-
-    .preview-tab.active {
-        display: block;
     }
 
 canvas {
     max-width: 100%;
     border: 1px solid #ddd;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .error {

@@ -11,7 +11,7 @@ window.jspdf = window.jspdf || {};
  */
 async function generatePDF() {
     const { jsPDF } = window.jspdf;
-    
+
     // 檢查jsPDF是否可用
     if (!jsPDF) {
         throw new Error('jsPDF 庫未正確載入');
@@ -37,26 +37,26 @@ async function generatePDF() {
         if (useCanvas1) {
             // 從Canvas獲取圖像資料
             const imgData1 = canvas1.toDataURL('image/jpeg', 0.95);
-            
+
             // 將圖像添加到PDF，保持適當的比例
             const canvasAspectRatio = canvas1.width / canvas1.height;
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
-            
+
             // 計算適當的圖像尺寸，使其適合頁面
             let imgWidth = pdfWidth;
             let imgHeight = imgWidth / canvasAspectRatio;
-            
+
             // 如果圖像高度超過頁面高度，則根據高度調整
             if (imgHeight > pdfHeight) {
                 imgHeight = pdfHeight;
                 imgWidth = imgHeight * canvasAspectRatio;
             }
-            
+
             // 計算居中位置
             const x = (pdfWidth - imgWidth) / 2;
             const y = (pdfHeight - imgHeight) / 2;
-            
+
             // 添加圖像到PDF
             pdf.addImage(imgData1, 'JPEG', x, y, imgWidth, imgHeight);
         } else {
@@ -71,26 +71,26 @@ async function generatePDF() {
         if (useCanvas2) {
             // 從Canvas獲取圖像資料
             const imgData2 = canvas2.toDataURL('image/jpeg', 0.95);
-            
+
             // 將圖像添加到PDF，保持適當的比例
             const canvasAspectRatio = canvas2.width / canvas2.height;
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
-            
+
             // 計算適當的圖像尺寸，使其適合頁面
             let imgWidth = pdfWidth;
             let imgHeight = imgWidth / canvasAspectRatio;
-            
+
             // 如果圖像高度超過頁面高度，則根據高度調整
             if (imgHeight > pdfHeight) {
                 imgHeight = pdfHeight;
                 imgWidth = imgHeight * canvasAspectRatio;
             }
-            
+
             // 計算居中位置
             const x = (pdfWidth - imgWidth) / 2;
             const y = (pdfHeight - imgHeight) / 2;
-            
+
             // 添加圖像到PDF
             pdf.addImage(imgData2, 'JPEG', x, y, imgWidth, imgHeight);
         } else {
@@ -120,7 +120,7 @@ function renderTextPageToPDF(pdf, isDeclaration) {
     } catch (e) {
         console.warn('無法設置中文字體:', e);
     }
-    
+
     // 獲取用戶資料
     const name = document.getElementById('name').value;
     const id = document.getElementById('id').value.toUpperCase();
@@ -132,29 +132,38 @@ function renderTextPageToPDF(pdf, isDeclaration) {
     const li = extractLiFromAddress(address);
     const currentDate = getCurrentDate();
 
-    // 處理地址拆分
+    // 處理地址拆分 - 修改為「鄰」以後的地址顯示在第二行
     let addressLine1 = '';
     let addressLine2 = '';
 
     if (address) {
-        // 分割地址邏輯
-        const segmentIndex = address.indexOf('段');
-        const roadIndex = address.indexOf('路');
-        const streetIndex = address.indexOf('街');
-        let splitIndex = Math.max(segmentIndex, roadIndex, streetIndex);
+        // 尋找「鄰」的位置
+        const neighborhoodIndex = address.indexOf('鄰');
 
-        if (splitIndex !== -1) {
-            addressLine1 = address.substring(0, splitIndex + 1);
-            addressLine2 = address.substring(splitIndex + 1);
+        if (neighborhoodIndex !== -1) {
+            // 分隔點存在，將地址分為兩部分
+            addressLine1 = address.substring(0, neighborhoodIndex + 1); // 包含「鄰」
+            addressLine2 = address.substring(neighborhoodIndex + 1);
         } else {
-            addressLine1 = address;
+            // 如果沒有找到「鄰」，回落到原來的邏輯
+            const segmentIndex = address.indexOf('段');
+            const roadIndex = address.indexOf('路');
+            const streetIndex = address.indexOf('街');
+            let splitIndex = Math.max(segmentIndex, roadIndex, streetIndex);
+
+            if (splitIndex !== -1) {
+                addressLine1 = address.substring(0, splitIndex + 1);
+                addressLine2 = address.substring(splitIndex + 1);
+            } else {
+                addressLine1 = address;
+            }
         }
     }
 
     // 頁面寬度和高度
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    
+
     // 設置標題和內容的位置
     const titleX = pageWidth / 2;
     let contentY = 60;
@@ -163,44 +172,44 @@ function renderTextPageToPDF(pdf, isDeclaration) {
 
     // 設置字體大小
     pdf.setFontSize(20);
-    
+
     if (isDeclaration) {
         // 聲明書頁面
         pdf.text('臺北市第8選舉區立法委員賴士葆罷免案聲明書', titleX, 30, { align: 'center' });
-        
+
         pdf.setFontSize(14);
         pdf.text(`簽名：${name}`, leftMargin, contentY);
         contentY += lineHeight;
-        
+
         pdf.text(`聯絡手機：${phone}`, leftMargin, contentY);
         contentY += lineHeight;
-        
+
         if (email) {
             pdf.text(`Email：${email}`, leftMargin, contentY);
             contentY += lineHeight;
         }
-        
+
         pdf.text(`里別：${li || '(未識別)'}`, leftMargin, contentY);
         contentY += lineHeight;
-        
+
         pdf.text(`簽署日期：${currentDate.month}月${currentDate.date}日`, leftMargin, contentY);
     } else {
         // 連署書頁面
         pdf.text('臺北市第8選舉區立法委員賴士葆罷免案連署書', titleX, 30, { align: 'center' });
-        
+
         pdf.setFontSize(14);
         pdf.text(`姓名：${name}`, leftMargin, contentY);
         contentY += lineHeight;
-        
+
         pdf.text(`身分證字號：${id}`, leftMargin, contentY);
         contentY += lineHeight;
-        
+
         pdf.text(`出生年月日：${formattedBirthDate}`, leftMargin, contentY);
         contentY += lineHeight;
-        
+
         pdf.text(`戶籍地址：${addressLine1}`, leftMargin, contentY);
         contentY += lineHeight;
-        
+
         if (addressLine2) {
             pdf.text(`　　　　　${addressLine2}`, leftMargin, contentY);
         }
@@ -213,23 +222,23 @@ function renderTextPageToPDF(pdf, isDeclaration) {
  */
 async function generateTextOnlyPDF() {
     const { jsPDF } = window.jspdf;
-    
+
     // 創建A4橫向格式的PDF
     const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
         format: 'a4'
     });
-    
+
     // 渲染聲明書頁面
     renderTextPageToPDF(pdf, true);
-    
+
     // 添加新頁面
     pdf.addPage();
-    
+
     // 渲染連署書頁面
     renderTextPageToPDF(pdf, false);
-    
+
     // 生成PDF blob
     return pdf.output('blob');
 }
@@ -244,10 +253,10 @@ async function downloadPDF() {
         const loadingMessage = document.getElementById('loadingMessage');
         loading.style.display = 'flex';
         loadingMessage.textContent = '產生PDF中，請稍候...';
-        
+
         // 生成PDF
         const pdfBlob = await generatePDF();
-        
+
         // 創建臨時連結並點擊以下載文件
         const link = document.createElement('a');
         link.href = URL.createObjectURL(pdfBlob);
@@ -255,18 +264,18 @@ async function downloadPDF() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         // 關閉載入中動畫
         loading.style.display = 'none';
-        
+
         return true;
     } catch (error) {
         console.error('下載PDF時發生錯誤:', error);
         alert('下載PDF時發生錯誤，請稍後再試');
-        
+
         // 關閉載入中動畫
         document.getElementById('loading').style.display = 'none';
-        
+
         return false;
     }
 }

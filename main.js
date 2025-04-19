@@ -9,10 +9,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
     const clearBtn = document.getElementById('clearBtn');
     const previewContainer = document.getElementById('previewContainer');
-    const tab1Btn = document.getElementById('tab1Btn');
-    const tab2Btn = document.getElementById('tab2Btn');
-    const previewTab1 = document.getElementById('previewTab1');
-    const previewTab2 = document.getElementById('previewTab2');
     const loading = document.getElementById('loading');
     const loadingMessage = document.getElementById('loadingMessage');
     const addressInput = document.getElementById('address');
@@ -37,21 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('addressError').textContent = "";
     document.getElementById('phoneError').textContent = "";
     document.getElementById('addressConfirmError').textContent = "";
-
-    // 切換頁籤
-    tab1Btn.addEventListener('click', function () {
-        tab1Btn.classList.add('active');
-        tab2Btn.classList.remove('active');
-        previewTab1.classList.add('active');
-        previewTab2.classList.remove('active');
-    });
-
-    tab2Btn.addEventListener('click', function () {
-        tab2Btn.classList.add('active');
-        tab1Btn.classList.remove('active');
-        previewTab2.classList.add('active');
-        previewTab1.classList.remove('active');
-    });
 
     // 監聽地址變更，即時更新里別顯示與檢查格式
     addressInput.addEventListener('input', function () {
@@ -129,26 +110,31 @@ document.addEventListener('DOMContentLoaded', function () {
             const dataUrl1 = page1Loaded ? document.getElementById('previewCanvas1').toDataURL('image/png') : null;
             const dataUrl2 = page2Loaded ? document.getElementById('previewCanvas2').toDataURL('image/png') : null;
 
-            // 處理地址拆分
+            // 處理地址拆分（修改為「鄰」以後的地址顯示在第二行）
             let addressLine1 = '';
             let addressLine2 = '';
 
             if (address) {
-                // 找出「段」、「路」或「街」的位置
-                const segmentIndex = address.indexOf('段');
-                const roadIndex = address.indexOf('路');
-                const streetIndex = address.indexOf('街');
+                // 尋找「鄰」的位置
+                const neighborhoodIndex = address.indexOf('鄰');
 
-                // 取三者中最後出現的位置作為分隔點
-                let splitIndex = Math.max(segmentIndex, roadIndex, streetIndex);
-
-                if (splitIndex !== -1) {
-                    // 分隔點存在，將地址分為兩部分
-                    addressLine1 = address.substring(0, splitIndex + 1); // 包含「段」「路」或「街」
-                    addressLine2 = address.substring(splitIndex + 1);
+                if (neighborhoodIndex !== -1) {
+                    // 找到「鄰」，分隔為兩部分
+                    addressLine1 = address.substring(0, neighborhoodIndex + 1); // 包含「鄰」
+                    addressLine2 = address.substring(neighborhoodIndex + 1);
                 } else {
-                    // 如果沒有找到分隔點，全部放第一行
-                    addressLine1 = address;
+                    // 如果沒有找到「鄰」，回落到原來的邏輯
+                    const segmentIndex = address.indexOf('段');
+                    const roadIndex = address.indexOf('路');
+                    const streetIndex = address.indexOf('街');
+                    let splitIndex = Math.max(segmentIndex, roadIndex, streetIndex);
+
+                    if (splitIndex !== -1) {
+                        addressLine1 = address.substring(0, splitIndex + 1);
+                        addressLine2 = address.substring(splitIndex + 1);
+                    } else {
+                        addressLine1 = address;
+                    }
                 }
             }
 
@@ -257,7 +243,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="field"><strong>姓名：</strong>${name}</div>
                             <div class="field"><strong>身分證字號：</strong>${id}</div>
                             <div class="field"><strong>出生年月日：</strong>${formattedBirthDate}</div>
-                            <div class="field"><strong>戶籍地址：</strong>${addressLine1} ${addressLine2}</div>
+                            <div class="field"><strong>戶籍地址：</strong>${addressLine1}</div>
+                            <div class="field"><strong>　　　　　</strong>${addressLine2}</div>
                         </div>
                     </div>
                 `;

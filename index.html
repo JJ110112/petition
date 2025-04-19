@@ -109,16 +109,10 @@
                 <button type="button" id="downloadPdfBtn" class="download-pdf-btn" disabled>下載 PDF</button>
                 <button type="button" id="clearBtn" class="clear-btn">清除</button>
             </div>
-
         </form>
 
         <div id="previewContainer">
-            <div class="tab-buttons">
-                <button id="tab1Btn" class="tab-button active">聲明書 (第1頁)</button>
-                <button id="tab2Btn" class="tab-button">連署書 (第2頁)</button>
-            </div>
-
-            <div id="previewTab1" class="preview-tab active">
+            <div class="preview-section">
                 <h3>聲明書預覽</h3>
                 <canvas id="previewCanvas1"></canvas>
                 <div id="previewPlaceholder1" class="preview-placeholder">
@@ -127,7 +121,7 @@
                 </div>
             </div>
 
-            <div id="previewTab2" class="preview-tab">
+            <div class="preview-section">
                 <h3>連署書預覽</h3>
                 <canvas id="previewCanvas2"></canvas>
                 <div id="previewPlaceholder2" class="preview-placeholder">

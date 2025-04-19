@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>臺北市第8選舉區立法委員賴士葆罷免案連署表單</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    
+    <link rel="stylesheet" href="styles.css">
+    <!-- 引入 jsPDF 庫 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- 引入 html2canvas 庫，用於將 HTML 轉換為圖像 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <script type=“text/javascript” src=“index.js”></script>
@@ -14,9 +17,14 @@
         <h1>賴士葆罷免案連署表單</h1>
 
         <div class="notification">
-            此系統只適用於產生賴仕葆罷免連署書<br>
+            此系統只適用於產生賴士葆罷免連署書<br>
             操作過程於使用者電腦或手機端完成<br>
             不會上傳或紀錄個人資料<br>
+            紙張務必選 A4 格式<br>
+            電腦使用 Chrome 瀏覽器可有線或無線列印<br>
+            安卓手機使用 Chrome 瀏覽器可無線列印<br>
+            使用 iPhone 或有問題請下載 PDF 再列印<br>
+            本系統由"文山退葆"志工製作<br>
             請先填寫以下資料
         </div>
 
@@ -28,7 +36,7 @@
             </div>
 
             <div class="form-group">
-                <label for="id">身分證字號</label>
+                <label for="id">身分證字號（首字要大寫英文字母）</label>
                 <input type="text" id="id" name="id" maxlength="10" value="A123456789" required>
                 <div id="idError" class="error"></div>
             </div>
@@ -41,16 +49,47 @@
 
             <div class="form-group">
                 <label for="address">戶籍地址</label>
-                <input type="text" id="address" name="address" value="台北市文山區萬有里20鄰羅斯福路六段120巷5弄50之9號八樓" required>
+                <label for="address">要與身分證上的住址一模一樣!</label>
+                <label for="address">段、樓要用國字(一、二、...)</label>
+
+                <!-- 改進的地址輸入欄位 -->
+                <div class="address-container">
+                    <!-- 固定的臺北市前綴 -->
+                    <div class="address-prefix">臺北市</div>
+
+                    <!-- 區域下拉選單 -->
+                    <select id="district" class="address-select">
+                        <option value="文山區">文山區</option>
+                        <option value="中正區">中正區</option>
+                    </select>
+
+                    <!-- 里輸入欄位 -->
+                    <div class="address-input-group">
+                        <input type="text" id="li" class="address-input" placeholder="里別">
+                        <span class="address-label">里</span>
+                    </div>
+
+                    <!-- 鄰輸入欄位 -->
+                    <div class="address-input-group">
+                        <input type="text" id="lin" class="address-input" placeholder="鄰別">
+                        <span class="address-label">鄰</span>
+                    </div>
+
+                    <!-- 剩餘地址輸入欄位 -->
+                    <input type="text" id="addressRemain" class="address-remain" placeholder="完整地址（路/街、巷、弄、號、樓）">
+                </div>
+
+                <!-- 隱藏的完整地址欄位（用於與現有程式碼兼容） -->
+                <input type="hidden" id="address" name="address" value="台北市文山區萬有里20鄰羅斯福路六段120巷5弄50之9號八樓">
+
                 <div id="addressError" class="error"></div>
                 <div class="notification">
                     <label>
                         <input type="checkbox" id="addressConfirm">
-                        我確認以上地址和身分證背後所寫的地址是一致的（包括鄰、里、路/街、巷弄等）
+                        我確認以上地址和身分證背後所寫的地址是一致的<br>（包括鄰、里、路/街、巷弄等）
                     </label>
                     <div id="addressConfirmError" class="error"></div>
                 </div>
-                <!--<div class="field-info">系統將自動提取「<span id="liDisplay" class="auto-extract">萬有里</span>」作為里別</div>-->
             </div>
 
             <div class="form-group">
@@ -65,19 +104,13 @@
                 <div id="emailError" class="error"></div>
             </div>
 
-            <div class="buttons">
+            <div class="buttons-row">
                 <button type="button" id="previewBtn" class="preview-btn">預覽文件</button>
                 <button type="button" id="printBtn" class="print-btn" disabled>列印文件</button>
+                <button type="button" id="downloadPdfBtn" class="download-pdf-btn" disabled>下載 PDF</button>
                 <button type="button" id="clearBtn" class="clear-btn">清除</button>
             </div>
 
-            <div class="important-notification">
-                注意：您必須以一張一頁的方式列印<br>
-                在連署書簽名欄以正楷親自簽名或蓋章<br>
-                並交給現場志工或官方認可之連署站點<br>
-                或寄送至116970木柵郵局第224號信箱<br>
-                才算完成連署作業！<br>
-            </div>
         </form>
 
         <div id="previewContainer">
@@ -112,5 +145,19 @@
             <p id="loadingMessage">處理中，請稍候...</p>
         </div>
     </div>
-   </body>
+
+    <div class="important-notification">
+        注意：您必須以一張一頁的方式列印<br>
+        在連署書簽名欄以正楷親自簽名或蓋章<br>
+        並交給現場志工或 <a href="https://sites.google.com/view/banibao/%E9%80%A3%E7%BD%B2%E7%AB%99%E8%B3%87%E8%A8%8A">官方認可之連署站</a><br>
+        或寄送至116970木柵郵局第224號信箱<br>
+        才算完成連署作業！<br>
+    </div>
+
+    <script src="validation.js"></script>
+    <script src="drawing.js"></script>
+    <script src="pdf-generator.js"></script>
+    <script src="main.js"></script>
+    <script src="address-input.js"></script>
+</body>
 </html>

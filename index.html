@@ -41,19 +41,19 @@
         <form id="petitionForm">
             <div class="form-group">
                 <label for="name">姓名</label>
-                <input type="text" id="name" name="name" value="王小明" required>
+                <input type="text" id="name" name="name" required>
                 <div id="nameError" class="error"></div>
             </div>
 
             <div class="form-group">
                 <label for="id">身分證字號（首字要大寫英文字母）</label>
-                <input type="text" id="id" name="id" maxlength="10" value="A123456789" required>
+                <input type="text" id="id" name="id" maxlength="10" required>
                 <div id="idError" class="error"></div>
             </div>
 
             <div class="form-group">
                 <label for="birthDate">民國出生年月日（例如：88.1.25）</label>
-                <input type="text" id="birthDate" name="birthDate" value="88.1.25" required>
+                <input type="text" id="birthDate" name="birthDate" required>
                 <div id="birthError" class="error"></div>
             </div>
 
@@ -90,7 +90,7 @@
                 </div>
 
                 <!-- 隱藏的完整地址欄位（用於與現有程式碼兼容） -->
-                <input type="hidden" id="address" name="address" value="台北市文山區萬有里20鄰羅斯福路六段120巷5弄50之9號八樓">
+                <input type="hidden" id="address" name="address">
 
                 <div id="addressError" class="error"></div>
                 <div class="notification">
@@ -104,13 +104,13 @@
 
             <div class="form-group">
                 <label for="phone">聯絡手機</label>
-                <input type="tel" id="phone" name="phone" value="0932123456" required>
+                <input type="tel" id="phone" name="phone" required>
                 <div id="phoneError" class="error"></div>
             </div>
 
             <div class="form-group">
                 <label for="email">Email (選填)</label>
-                <input type="email" id="email" name="email" value="nicetomeetyou@google.com">
+                <input type="email" id="email" name="email">
                 <div id="emailError" class="error"></div>
             </div>
 
@@ -163,5 +163,6 @@
     <script src="pdf-generator.js"></script>
     <script src="main.js"></script>
     <script src="address-input.js"></script>
+    <script src="url-parameters.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /**
- * 驗證相關函數
+ * 驗證相關函數 - 增強版
  */
 
 /**
@@ -164,25 +164,88 @@ function validateAddress(address) {
 }
 
 /**
- * 驗證身分證字號
+ * 驗證身分證字號（含檢查碼驗證）
  * @param {string} id - 用戶輸入的身分證字號
- * @returns {boolean} - 是否符合身分證字號格式
+ * @returns {boolean} - 是否符合身分證字號格式和檢查碼驗證
  */
 function validateID(id) {
-    const letters = 'ABCDEFGHJKLMNPQRSTUVXYWZIO';
+    // 基本格式檢查：1個大寫英文字母 + 1個1或2 + 8碼數字
     const idRegex = /^[A-Z][1-2]\d{8}$/;
-
     if (!idRegex.test(id)) {
         return false;
     }
 
-    const letterIndex = letters.indexOf(id.charAt(0));
-    if (letterIndex === -1) {
+    // 英文字母對應的數字 (A=10, B=11, C=12..., Y=35, Z=10)
+    const letterValues = {
+        A: 10, B: 11, C: 12, D: 13, E: 14, F: 15, G: 16, H: 17, I: 34,
+        J: 18, K: 19, L: 20, M: 21, N: 22, O: 35, P: 23, Q: 24, R: 25,
+        S: 26, T: 27, U: 28, V: 29, W: 32, X: 30, Y: 31, Z: 33
+    };
+
+    // 取得第一個字母對應的數值
+    const letterValue = letterValues[id[0]];
+    if (!letterValue) {
+        return false; // 無效的字母
+    }
+
+    // 將字母對應的十位數和個位數分開
+    const letterTens = Math.floor(letterValue / 10);
+    const letterUnits = letterValue % 10;
+
+    // 計算檢查碼
+    // 依照公式: 
+    // letterTens + letterUnits*9 + id[1]*8 + id[2]*7 + ... + id[8]*1 + id[9]
+    // 結果必須被10整除
+
+    let sum = letterTens + letterUnits * 9;
+    for (let i = 1; i <= 8; i++) {
+        sum += parseInt(id[i]) * (9 - i);
+    }
+    sum += parseInt(id[9]); // 檢查碼
+
+    return sum % 10 === 0;
+}
+
+/**
+ * 驗證出生年月日格式和有效性
+ * @param {string} birthDateStr - 用戶輸入的出生年月日 (例如: 88.1.25)
+ * @returns {boolean} - 是否符合有效的日期格式
+ */
+function validateBirthDate(birthDateStr) {
+    // 解析出生年月日
+    const birthDate = parseBirthDate(birthDateStr);
+    if (!birthDate) {
         return false;
     }
 
-    // 這裡可以加上完整的身分證字號檢查演算法
-    return true;
+    // 將民國年轉換為西元年
+    const year = parseInt(birthDate.year) + 1911;
+    const month = parseInt(birthDate.month);
+    const day = parseInt(birthDate.day);
+
+    // 檢查月份是否有效 (1-12)
+    if (month < 1 || month > 12) {
+        return false;
+    }
+
+    // 檢查日期是否有效 (根據不同月份的天數)
+    const daysInMonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    // 處理閏年
+    if (isLeapYear(year)) {
+        daysInMonth[2] = 29;
+    }
+
+    return day > 0 && day <= daysInMonth[month];
+}
+
+/**
+ * 判斷是否為閏年
+ * @param {number} year - 西元年
+ * @returns {boolean} - 是否為閏年
+ */
+function isLeapYear(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
 }
 
 /**
@@ -207,16 +270,19 @@ function validatePhone(phone) {
 /**
  * 解析出生年月日格式為年、月、日的物件
  * @param {string} birthDateStr - 用戶輸入的出生年月日 (例如: 88.1.25)
- * @returns {Object} - 包含年、月、日的物件
+ * @returns {Object} - 包含年、月、日的物件，解析失敗則返回null
  */
 function parseBirthDate(birthDateStr) {
     const parts = birthDateStr.split('.');
     if (parts.length === 3) {
-        return {
-            year: parts[0].trim(),
-            month: parts[1].trim(),
-            day: parts[2].trim()
-        };
+        // 確保年月日都是數字
+        if (/^\d+$/.test(parts[0]) && /^\d+$/.test(parts[1]) && /^\d+$/.test(parts[2])) {
+            return {
+                year: parts[0].trim(),
+                month: parts[1].trim(),
+                day: parts[2].trim()
+            };
+        }
     }
     return null;
 }
@@ -274,6 +340,9 @@ function validateForm() {
     } else if (!/^[A-Z][0-9]{9}$/.test(id)) {
         document.getElementById('idError').textContent = '身分證字號格式錯誤，需為1個大寫英文字母＋9碼數字';
         hasError = true;
+    } else if (!validateID(id)) {
+        document.getElementById('idError').textContent = '身分證字號檢查碼錯誤，請確認號碼是否正確';
+        hasError = true;
     } else {
         document.getElementById('idError').textContent = '';
     }
@@ -281,8 +350,8 @@ function validateForm() {
     if (!birthDate) {
         document.getElementById('birthError').textContent = '請輸入出生年月日';
         hasError = true;
-    } else if (birthDate.length > 8) {
-        document.getElementById('birthError').textContent = '出生年月日格式錯誤，請勿超過8個字';
+    } else if (!validateBirthDate(birthDate)) {
+        document.getElementById('birthError').textContent = '出生年月日格式錯誤或日期無效';
         hasError = true;
     } else {
         document.getElementById('birthError').textContent = '';

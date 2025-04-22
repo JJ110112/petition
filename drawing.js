@@ -55,7 +55,7 @@ const PETITION_COORDS = {
     ADDRESS_LINE1_Y: 370,
 
     // 地址第二行座標位置
-    ADDRESS_LINE2_X: 810,
+    ADDRESS_LINE2_X: 802,
     ADDRESS_LINE2_Y: 417
 };
 

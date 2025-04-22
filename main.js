@@ -1,5 +1,5 @@
 /**
- * 主程式邏輯
+ * 主程式邏輯 - 修改版
  */
 document.addEventListener('DOMContentLoaded', function () {
     // 獲取DOM元素
@@ -17,22 +17,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // 加載圖片資源
     loadImages();
 
-    // 直接清除表單（不使用按鈕點擊事件）
-    document.getElementById('name').value = "";
-    document.getElementById('id').value = "";
-    document.getElementById('birthDate').value = "";
-    document.getElementById('address').value = "";
-    document.getElementById('phone').value = "";
-    document.getElementById('email').value = "";
-    document.getElementById('addressConfirm').checked = false;
+    // 檢查URL參數
+    const urlParams = new URLSearchParams(window.location.search);
 
-    // 清除錯誤訊息
-    document.getElementById('nameError').textContent = "";
-    document.getElementById('idError').textContent = "";
-    document.getElementById('birthError').textContent = "";
-    document.getElementById('addressError').textContent = "";
-    document.getElementById('phoneError').textContent = "";
-    document.getElementById('addressConfirmError').textContent = "";
+    // 如果沒有URL參數，則清除表單（初始狀態）
+    if (!urlParams.toString()) {
+        clearForm();
+    }
+    // URL參數會在url-parameters.js中處理
 
     // 監聽地址變更，即時更新里別顯示與檢查格式
     addressInput.addEventListener('input', function () {
@@ -70,24 +62,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 清除按鈕點擊事件 - 保留原始邏輯，地址輸入元件在 address-input.js 中處理
-    clearBtn.addEventListener('click', function () {
-        document.getElementById('name').value = "";
-        document.getElementById('id').value = "";
-        document.getElementById('birthDate').value = "";
-        document.getElementById('address').value = "";
-        document.getElementById('phone').value = "";
-        document.getElementById('email').value = "";
-        document.getElementById('addressConfirm').checked = false;
-
-        // 清除錯誤訊息
-        document.getElementById('nameError').textContent = "";
-        document.getElementById('idError').textContent = "";
-        document.getElementById('birthError').textContent = "";
-        document.getElementById('addressError').textContent = "";
-        document.getElementById('phoneError').textContent = "";
-        document.getElementById('addressConfirmError').textContent = "";
-    });
+    // 清除按鈕點擊事件
+    clearBtn.addEventListener('click', clearForm);
 
     // 列印按鈕點擊事件
     printBtn.addEventListener('click', function () {
@@ -278,6 +254,30 @@ document.addEventListener('DOMContentLoaded', function () {
             downloadPDF();
         }
     });
+
+    // 清除表單的函數
+    function clearForm() {
+        document.getElementById('name').value = "";
+        document.getElementById('id').value = "";
+        document.getElementById('birthDate').value = "";
+        document.getElementById('address').value = "";
+        document.getElementById('phone').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('addressConfirm').checked = false;
+
+        // 清除地址元件的欄位
+        document.getElementById('li').value = "";
+        document.getElementById('lin').value = "";
+        document.getElementById('addressRemain').value = "";
+
+        // 清除錯誤訊息
+        document.getElementById('nameError').textContent = "";
+        document.getElementById('idError').textContent = "";
+        document.getElementById('birthError').textContent = "";
+        document.getElementById('addressError').textContent = "";
+        document.getElementById('phoneError').textContent = "";
+        document.getElementById('addressConfirmError').textContent = "";
+    }
 
     // 初始化時執行一次地址提取，並檢查地址格式
     const initialAddress = document.getElementById('address').value;
